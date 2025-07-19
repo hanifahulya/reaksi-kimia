@@ -1,1 +1,0 @@
-# <isi dengan data 118 unsur>
