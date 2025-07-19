@@ -37,5 +37,6 @@ if 'selected_elements' not in st.session_state:
     st.session_state.selected_elements = []
         for opsi in hasil['setara_opsi']:
     if hasil.get('setara'):
-    st.latex(input_reaksi.replace('→', ' ightarrow '))
+    st.latex(input_reaksi.replace('→', ' 
+ightarrow '))
     if mr_produk: st.info(f'Massa molekul produk utama: {mr_produk:.2f}')
