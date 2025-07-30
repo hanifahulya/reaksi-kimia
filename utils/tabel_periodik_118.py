@@ -18,7 +18,7 @@ massa_atom = {
 
 elemen_periodik = [
     # Baris 1
-    [{"simbol": "H", "golongan": "nonlogam"}] + [{}]*16 + [{"simbol": "He", "golongan": "gas mulia"}],
+    [{"simbol": "H", "golongan": "nonlogam", "nama": "Hidrogen", "nomor_atom": 1}] + [{}]*16 + [{"simbol": "He", "golongan": "gas mulia"}],
     
     # Baris 2
     [{"simbol": "Li", "golongan": "logam alkali"},
@@ -26,18 +26,18 @@ elemen_periodik = [
     [{"simbol": "B", "golongan": "metaloid"},
      {"simbol": "C", "golongan": "nonlogam"},
      {"simbol": "N", "golongan": "nonlogam"},
-     {"simbol": "O", "golongan": "nonlogam"},
+     {"simbol": "O", "golongan": "nonlogam", "nama": "Oksigen", "nomor_atom": 8},
      {"simbol": "F", "golongan": "halogen"},
      {"simbol": "Ne", "golongan": "gas mulia"}],
     
     # Baris 3
-    [{"simbol": "Na", "golongan": "logam alkali"},
+    [{"simbol": "Na", "golongan": "logam alkali", "nama": "Natrium", "nomor_atom": 11},
      {"simbol": "Mg", "golongan": "logam alkali tanah"}] + [{}]*10 +
     [{"simbol": "Al", "golongan": "logam pasca transisi"},
      {"simbol": "Si", "golongan": "metaloid"},
      {"simbol": "P", "golongan": "nonlogam"},
      {"simbol": "S", "golongan": "nonlogam"},
-     {"simbol": "Cl", "golongan": "halogen"},
+     {"simbol": "Cl", "golongan": "halogen", "nama": "Klorin", "nomor_atom": 17},
      {"simbol": "Ar", "golongan": "gas mulia"}],
 
     # Baris 4
