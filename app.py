@@ -1,88 +1,72 @@
 import streamlit as st
-from periodic_table_ui import render_periodic_table_with_callback
-from reaction_engine import proses_reaksi
-from tabel_periodik_118 import elemen_periodik
+from periodic_table_ui import tampilkan_tabel_periodik, tampilkan_tabel_info_unsur
+from reaction_engine import susun_reaksi_dari_unsur, hitung_massa_molekul
+from utils.tabel_periodik_118 import Ar_tiap_unsur
 
-st.set_page_config(layout="wide")
+st.set_page_config(page_title="Penyusun Persamaan Reaksi Kimia", layout="wide")
 
-st.markdown("""
-    <h1 style='text-align: center;'>🧪 Penyusun Persamaan Reaksi Kimia</h1>
-    """, unsafe_allow_html=True)
+st.title("🧪 Penyusun Persamaan Reaksi Kimia")
 
+# Sidebar Navigasi
 with st.sidebar:
     st.markdown("### 📌 Navigasi")
-    halaman = st.radio("Pilih Halaman", ["📘 Dasar Teori", "📊 Tabel Periodik", "🧾 Info Unsur"])
+    halaman = st.radio("Pilih Halaman", ["📘 Dasar Teori", "🔬 Tabel Periodik", "🔎 Info Unsur"], label_visibility="collapsed")
 
-if "unsur_dipilih" not in st.session_state:
-    st.session_state.unsur_dipilih = []
-
-if halaman == "📘 Dasar Teori":
+# Halaman Dasar Teori
+if "Dasar Teori" in halaman:
     st.header("📘 Dasar Teori")
-    st.write("""
-        Persamaan reaksi kimia merupakan representasi simbolik dari reaksi kimia dengan menyatakan reaktan dan produk yang
-        terlibat. Persamaan reaksi kimia menyatakan secara simbolik reaksi kimia dengan menggunakan rumus kimia dari zat-zat yang
-        terlibat. Agar sah secara hukum kekekalan massa, persamaan ini harus setara, yaitu jumlah atom untuk setiap unsur harus sama
-        di kedua sisi reaksi.
-        
-        ### 🧬 Contoh Persamaan Setara:
-        [ 2H_2 + O_2 \rightarrow 2H_2O ]
+    st.markdown("""
+    Persamaan reaksi kimia merupakan representasi simbolik dari reaksi kimia dengan menyatakan reaktan dan produk yang terlibat. 
+    Persamaan reaksi kimia menyatakan secara simbolik reaksi kimia dengan menggunakan rumus kimia dari zat-zat yang terlibat. Agar sah secara hukum kekekalan massa, persamaan ini harus setara, yaitu jumlah atom untuk setiap unsur harus sama di kedua sisi reaksi.
 
-        Jenis reaksi kimia umum meliputi:
-        - Reaksi Kombinasi (Sintesis) 🍀
-        - Reaksi Penguraian (Dekomposisi) ⚡️
-        - Reaksi Pergantian Tunggal 🔁
-        - Reaksi Pergantian Ganda 🔄
-        - Reaksi Pembakaran 🔥
+    🧬 **Contoh Persamaan Setara:**  
+    \\[ 2H_2 + O_2 \\rightarrow 2H_2O \\]
 
-        Aplikasi ini membantu menyusun reaksi antara dua unsur dan menampilkan:
-        - Jenis reaksi
-        - Persamaan reaksi yang terbentuk
-        - Massa molekul relatif (Mr) dari senyawa hasil reaksi
+    Jenis reaksi kimia umum meliputi:
+    - Reaksi Kombinasi (Sintesis) 🧩
+    - Reaksi Penguraian (Dekomposisi) ⚡
+    - Reaksi Pergantian Tunggal 🔁
+    - Reaksi Pergantian Ganda 🔄
+    - Reaksi Pembakaran 🔥
+
+    Aplikasi ini membantu menyusun reaksi antara dua unsur dan menampilkan:
+    - Persamaan reaksi setara
+    - Jenis reaksi ⚗️
+    - Berat molekul (BM) senyawa hasil reaksi dalam satuan **g/mol** ⚖️
     """)
 
-elif halaman == "📊 Tabel Periodik":
-    st.header("📊 Tabel Periodik")
-    st.markdown("Klik dua unsur untuk melihat reaksi kimianya.")
-    
-    def on_click(unsur):
-        if len(st.session_state.unsur_dipilih) >= 2:
-            st.session_state.unsur_dipilih = []
-        st.session_state.unsur_dipilih.append(unsur)
+# Halaman Tabel Periodik Interaktif
+elif "Tabel Periodik" in halaman:
+    st.header("🔬 Tabel Periodik Unsur")
 
-    render_periodic_table_with_callback(elemen_periodik, on_click)
+    gol_filter = st.selectbox("Filter Unsur berdasarkan Golongan", 
+                              options=["Semua", "logam alkali", "logam alkali tanah", "logam transisi", 
+                                       "logam pasca transisi", "metaloid", "nonlogam", "halogen", 
+                                       "gas mulia", "lanthanida", "aktinida"])
 
-    if len(st.session_state.unsur_dipilih) == 2:
-        unsur1, unsur2 = st.session_state.unsur_dipilih
-        hasil = proses_reaksi(unsur1, unsur2)
+    tampilkan_tabel_periodik(
+        filter_golongan=gol_filter if gol_filter != "Semua" else None,
+        dengan_warna=True
+    )
 
-        st.subheader("🔬 Hasil Reaksi: {} + {}".format(unsur1, unsur2))
+    if "selected_elements" in st.session_state and len(st.session_state.selected_elements) == 2:
+        unsur1, unsur2 = st.session_state.selected_elements
+        st.subheader(f"🔍 Hasil Reaksi: {unsur1} + {unsur2}")
+        hasil = susun_reaksi_dari_unsur([unsur1, unsur2])
         if hasil:
-            st.latex(hasil["persamaan"])
+            st.subheader("📄 Persamaan Reaksi:")
+            st.latex(hasil["setara"] if "setara" in hasil else hasil["setara_opsi"][0])
             st.success(f"Jenis Reaksi: {hasil['jenis']}")
-            st.info(f"Massa molekul relatif (Mr) dari {hasil['senyawa']}: {hasil['massa_molekul']}")
+            produk = hasil.get("produk", hasil.get("produk_opsional", ["?"])[0])
+            bm = hitung_massa_molekul(produk)
+            if bm:
+                st.info(f"Massa molekul relatif (Mr) dari {produk}: {round(bm, 2)}")
         else:
-            st.error("Reaksi tidak ditemukan untuk kombinasi unsur ini.")
+            st.warning("Tidak ditemukan reaksi yang cocok antara kedua unsur ini.")
+        if st.button("🔁 Reset Pilihan"):
+            st.session_state.selected_elements = []
 
-        if st.button("Reset Pilihan Unsur"):
-            st.session_state.unsur_dipilih = []
-
-elif halaman == "🧾 Info Unsur":
-    st.header("🧾 Info Unsur")
-
-    def show_info(unsur):
-        data = next((e for e in elemen_periodik if e["simbol"] == unsur), None)
-        if data:
-            st.markdown(f"""
-                ### ℹ️ {data['simbol']} - {data['nama']}
-                - **Nomor Atom**: {data['nomor_atom']}
-                - **Golongan**: {data['golongan']}
-                - **Massa Molar**: {data['massa']} g/mol
-            """)
-
-    def on_click_unsur(unsur):
-        st.session_state.unsur_dipilih_info = unsur
-
-    render_periodic_table_with_callback(elemen_periodik, on_click_unsur)
-
-    if "unsur_dipilih_info" in st.session_state:
-        show_info(st.session_state.unsur_dipilih_info)
+# Halaman Info Unsur
+elif "Info Unsur" in halaman:
+    st.header("🔎 Informasi Unsur Kimia")
+    tampilkan_tabel_info_unsur()
