@@ -1,5 +1,5 @@
 import streamlit as st
-from periodic_table_ui import tampilkan_tabel_periodik
+from periodic_table_ui import render_periodic_table
 from reaction_engine import susun_reaksi_dari_unsur
 from utils.tabel_periodik_118 import Ar_tiap_unsur
 
